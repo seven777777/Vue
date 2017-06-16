@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			* {
+				font-family: simhei, Helvetica, Arial, sans-serif;
+			}
+			.dialog{
+				width: 480px;
+				position: fixed;
+				left: 50%;
+				top: 2em;
+				transform: translateX(-50%);
+				z-index: 2000;
+				visibility: hidden;
+				backface-visibility: hidden;/* 属性指定当元素背面朝向观察者时不可见 */
+				perspective: 1300px;/* 属性指定了观察者与z=0平面的距离，使具有三维位置变换的元素产生透视效果 */
+			}
+			.dialog-content{
+				border-radius: 3px;
+				background: #fff;
+				overflow: hidden;
+				box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+				transition: .5s ease-in-out;
+				opacity: 0;
+				transform-style: preserve-3d;/*使子元素保留其3d位置*/
+				transform: rotateY(-70deg);
+			}
+			.rotate{ cursor: pointer; }
+			.close{
+				display: inline-block;
+				width: 2em;
+				height: 2rem;
+				position: absolute;
+				top: .5rem;
+				right: .5rem;
+				transition: .8s ease all;
+				border: none;
+				border-radius: 3px;
+				color: #333;
+				text-decoration: none;
+				box-sizing: border-box;
+				text-align: center;
+				border: 2px solid #fff;
+				border-radius: 50%;
+			}
+			.close .iconfont{
+				font-size: 1.5rem;
+				color: #fff;
+			}
+			.close:hover {
+				transition: .8s ease all;
+				-moz-transition: .8s ease all;
+				-webkit-transition: .8s ease all;
+			}
+			.rotate:hover {
+				transform: rotate(360deg);
+				-moz-transform: rotate(360deg);
+				-webkit-transform: rotate(360deg);
+				transition: transform 1.0s ease all;
+				-moz-transition: -moz-transform 1.0s ease all;
+				-webkit-transition: -webkit-transform 1.0s ease all;
+			}
+			.iconfont{
+				/*font-family: "iconfont" !important;*/
+				font-size: 16px;
+				font-style: normal;
+				-webkit-font-smoothing: antialiased;
+				--webkit-text-stroke-width: 0.2px;
+			    -moz-osx-font-smoothing: grayscale;
+			    transform-origin: center;
+			}
+			.icon-close:before {
+			    content: "X";
+			    line-height: 1.8rem;
+			}
+			.dialog-header{
+				background-color: #cb4a70;
+				color: #fff;
+			}
+			.dialog-title{
+				margin: 0;
+				font-size: 2em;
+				text-align: center;
+				font-weight: 200;
+				line-height: 2em;
+			}
+			.dialog-body{
+				padding: 2em;
+			}
+			.dialog-footer{
+				margin: 0 2em;
+				padding: 2em 0;
+				text-align: right;
+				border-top: 1px solid rgba(0,0,0,.1);
+			}
+			button{
+				display: inline-block;
+				border: 0;
+				box-sizing: border-box;
+				color: #fff;
+				font-size: 1em;
+				border-radius: .1em;
+				line-height: 2em;
+				padding: 0 1em;
+				transition: .4s ease-out;
+				outline: 0;
+				text-decoration: none;
+			}
+			.dialog-overlay{
+				content: '';
+				position: fixed;
+				visibility: hidden;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
+				z-index: 1000;
+				opacity: 0;
+				background: rgba(0,0,0,.5);
+				transition: all .6s;
+			}
+			.dialog-active ~ .dialog-overlay {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.btn-group{
+				margin: 200px auto;
+				width: 640px;
+			}
+			.btn-info{ background: #0090d3; }
+			.btn-success{ background: #00cc66; }
+			.btn-warning{ background: #f0ad4e; }
+			.btn-error{ background: #d9534f; }
+
+			button:hover,button:focus{
+				opacity: .5;
+				cursor: pointer;
+				transition: .15s ease-in;
+			}
+			.dialog-active{ visibility: visible; }
+			.dialog-active .dialog-content{
+				position: relative;
+				opacity: 1;
+				transform: rotateY(0);
+			}
+			.dialog-info .dialog-header, .dialog-info button {
+			    background-color: #0090d3;
+			}
+			.dialog-success .dialog-header, .dialog-success button {
+			    background-color: #00cc66;
+			}
+			.dialog-warning .dialog-header, .dialog-warning button {
+			    background-color: #f0ad4e;
+			}
+			.dialog-error .dialog-header, .dialog-error button {
+			    background-color: #d9534f;
+			}
+
+
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<modal-dialog v-bind:show.sync="show" v-bind:class="dialogClass">
+				
+				<header class="dialog-header" slot="header">
+					<h1 class="dialog-title">提示信息</h1>
+				</header>
+
+				<div class="dialog-body" slot="body">
+					<p>随便放一些东西</p>
+					<p>随便放一些东西，一些文字或图片，你开心就好</p>
+				</div>
+
+				<footer class="dialog-footer" slot="footer">
+					<button @click="closeDialog">关闭</button>
+				</footer>
+
+			</modal-dialog>
+
+			<div class="btn-group">
+				<button class="btn-info" @click="openDialog('dialog-info')">提示信息对话框</button>
+				<button class="btn-success" @click="openDialog('dialog-success')">提示成功对话框</button>
+				<button class="btn-warning" @click="openDialog('dialog-warning')">提示警告对话框</button>
+				<button class="btn-error" @click="openDialog('dialog-error')">提示错误对话框</button>
+			</div>
+		</div>
+
+		<!-- 组件模板 -->
+		<template id="dialog-template">
+			<div class="dialogs">
+				<div class="dialog" v-bind:class="{ 'dialog-active': show }">
+					<div class="dialog-content">
+						<div class="close rotate" @click="close">
+							<span class="iconfont icon-close"></span>
+						</div>
+						<slot name="header"></slot>
+						<slot name="body"></slot>
+						<slot name="footer"></slot>
+					</div>
+				</div>
+				<div class="dialog-overlay"></div>
+			</div>
+		</template>
+			
+		<script>
+			Vue.component('modal-dialog', {
+				template: '#dialog-template',
+				props: ['show'],
+				methods: {
+					close: function() {
+						this.show = false
+					}
+				}
+			})
+			new Vue({
+				el: '#app',
+				data: {
+					show: false,
+					dialogClass: 'dialog-info'
+				},
+				methods: {
+					openDialog: function(dialogClass) {
+						this.show = true
+						this.dialogClass = dialogClass
+					},
+					closeDialog: function() {
+						this.show = false
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

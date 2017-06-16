@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			table{
+				width: 600px;
+				border-collapse: collapse;
+			}
+			td{
+				border: 1px solid #e3e3e3;
+				padding: 6px 12px;
+			}
+			tr>td:nth-child(1){
+				font-weight: bold;
+				color: red;
+			}
+			thead{
+				background-color: #58a;
+				color: white;
+				border: 1px solid #e3e3e3;
+			}
+			tbody>tr:nth-child(2n){
+				background-color: #eee;
+			}
+			input[type=text]{ padding: 6px 12px; }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<table>
+				<thead>
+					<tr>
+						<th colspan="3">父组件数据</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>name</td>
+						<td>{{name}}</td>
+						<td><input type="text" v-model="name"></td>
+					</tr>
+					<tr>
+						<td>age</td>
+						<td>{{age}}</td>
+						<td><input type="text" v-model="age"></td>
+					</tr>
+				</tbody>
+			</table>
+			<br>
+			<!-- 单向绑定 -->
+			<!-- <my-component v-bind:my-name="name" v-bind:my-age="age"></my-component> -->
+			<!-- 双向绑定 -->
+			<!-- <my-component v-bind:my-name.sync="name" v-bind:my-age.sync="age"></my-component> -->
+			<!-- 单次绑定 -->
+			<my-component v-bind:my-name.once="name" v-bind:my-age.once="age"></my-component>
+		</div>
+
+		<!-- 组件模板 -->
+		<template id="myComponent">
+			<table>
+				<thead>
+					<tr>
+						<th colspan="3">子组件数据</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>my name</td>
+						<td>{{myName}}</td>
+						<td><input type="text" v-model="myName"></td>
+					</tr>
+					<tr>
+						<td>my age</td>
+						<td>{{myAge}}</td>
+						<td><input type="text" v-model="myAge"></td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+			
+		<script type="text/javascript">
+			var vm=new Vue({
+				el:'#app',
+				data:{
+					name:'seven',
+					age:18
+				},
+				components:{
+					'my-component':{
+						template:'#myComponent',
+						props:['myName','myAge']
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			table{
+				width: 600px;
+				border-collapse: collapse;
+			}
+			td{
+				border: 1px solid #e3e3e3;
+				padding: 6px 12px;
+			}
+			tr>td:nth-child(1){
+				font-weight: bold;
+				color: red;
+			}
+			thead{
+				background-color: #58a;
+				color: white;
+				border: 1px solid #e3e3e3;
+			}
+			tbody>tr:nth-child(2n){
+				background-color: #eee;
+			}
+			input[type=text]{ padding: 6px 12px; }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id="searchBar">
+				Search:
+				<input type="text" v-model="searchQuery">
+			</div>
+			<simple-grid :data="gridData" :columns="gridColumns" :filter-key="searchQuery"></simple-grid>
+		</div>
+
+		<!-- 组件模板 -->
+		<template id="grid-template">
+			<table>
+				<thead>
+					<tr>
+						<th v-for="col in columns">{{ col | capitalize }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="entry in data | filterBy filterKey">
+						<td v-for="col in columns">
+							{{entry[col]}}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+			
+		<script type="text/javascript">
+			Vue.component('simple-grid',{
+				template:"#grid-template",
+				props:{
+					data:Array,
+					columns:Array,
+					filterKey:String
+				}
+			})
+
+			var demo=new Vue({
+				el:'#app',
+				data:{
+					searchQuery:'',
+					gridColumns:["name","age","sex"],
+					gridData:[{
+						name:'Jack',
+						age:30,
+						sex:'Male'
+					},{
+						name:'Bill',
+						age:26,
+						sex:'Male'
+					},{
+						name:'Tracy',
+						age:22,
+						sex:'Female'
+					},{
+						name:'Chris',
+						age:36,
+						sex:'Male'
+					}]
+				}
+			})
+		</script>
+	</body>
+</html>

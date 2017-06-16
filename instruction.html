@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>指令</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+
+			table{
+				width: 500px;
+				text-align: center;
+				border-collapse: collapse;/* 边框会合并为一个单一的边框.忽略 border-spacing 和 empty-cells 属性 */
+			}
+			thead{
+				background: #58a;
+				color: white;
+			}
+			td{
+				border: 1px solid  #eee;
+			}
+			tr:nth-child(2n){
+				background: #eee;
+			}
+
+			#page{ 
+				margin: 0 auto;
+				max-width: 640px;
+			}
+
+			ul{
+				list-style: none;
+			}
+			ul li a{
+				text-decoration: none;
+				position: relative;
+				float: left;
+				padding: 6px 12px;
+				line-height: 1.5;
+				color: #009a61;
+				background-color: #fff;
+				border: 1px solid #ddd;
+				margin-left: -1px;
+			}
+			.pagination{
+				display: inline-block;
+				margin: 21px 0;
+			}
+			.pagination li{
+				display: inline;
+
+			}
+			.pagination .active{
+				color: #fff;
+				background-color: #009a61;
+				/*border-left: none;*/
+				/*border-right: none;*/
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+            <h1>Hello, Vue.js!</h1>
+            <h1 v-if="yes">Yes!</h1>
+            <h1 v-if="no">No!</h1>
+            <h1 v-if="age >= 25">Age: {{ age }}</h1>
+            <h1 v-if="name.indexOf('jack') >= 0">Name: {{ name }}</h1>
+        </div>
+
+		<div id="table">
+			<table>
+				<thead>
+					<tr>
+						<td>Name</td>
+						<td>Age</td>
+						<td>Sex</td>
+					</tr>
+				</thead>
+				<tbody>
+                    <tr v-for="person in people">
+                        <td>{{ person.name  }}</td>
+                        <td>{{ person.age  }}</td>
+                        <td>{{ person.sex  }}</td>
+                    </tr>
+                </tbody>
+			</table>
+		</div>
+
+		<div id="page">
+			<ul class="pagination">
+				<li v-for="n in pageCount">
+					<a href="javascript:void(0)" v-bind:class="activeNumber === n+1 ? 'active':''">{{ n+1 }}</a>
+				</li>
+			</ul>
+		</div>
+			
+		<script type="text/javascript">
+			var vm = new Vue({
+	            el: '#app',
+	            data: {
+	                yes: true,
+	                no: false,
+	                age: 18,
+	                name: 'jack'
+	            }
+	        })
+			var vm2 = new Vue({
+	            el: '#table',
+	            data: {
+	                people:[
+	                	{
+	                		name:'seven',
+	                		age:18,
+	                		sex:'Female'
+	                	},
+	                	{
+	                		name:'lilei',
+	                		age:22,
+	                		sex:'Male'
+	                	},
+	                	{
+	                		name:'hanmeimei',
+	                		age:22,
+	                		sex:'Female'
+	                	}
+	                ]
+	            }
+	        })
+	        var vm3 = new Vue({
+	            el: '#page',
+	            data: {
+	                activeNumber:1,
+	                pageCount:10
+	            }
+	        })
+		</script>
+	</body>
+</html>

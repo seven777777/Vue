@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>组件</title>
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<style type="text/css">
+			.fade-transition{
+				transition: opacity .3s ease;
+			}
+			.fade-enter, .fade-leave {
+				opacity: 0;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="example">
+			<my-component></my-component>
+		</div>
+		<br>
+		<br>
+		<br>
+		<!-- 子组件模板 -->
+		<template id="child-template">
+			<input v-model="msg">
+			<button v-on:click="notify">Dispatch Event</button>
+		</template>
+		<!-- 父组件模板 -->
+		<div id="events-example">
+			<p>Message:{{ messages | json }}</p>
+			<child></child>
+		</div>
+		<br>
+		<br>
+		<br>
+		<br>
+		<!-- 淡出淡入 -->
+		
+		<div id="transition-mode-demo">
+			<input type="radio" value="v-a" id="a" name="view" v-on:click="check">
+			<label for="a">A</label>
+			<input type="radio" value="v-b" id="b" name="view" v-on:click="check">
+			<label for="b">B</label>
+			<component
+		 	:is="view"
+		 	transition="fade"
+		 	transition-mode="out-in"></component>
+		</div>
+			
+		<script type="text/javascript">
+			// 定义
+			var MyComponent = Vue.extend({
+				template: '<div>A custom component!</div>'
+			})
+			// 注册
+			Vue.component('my-component',MyComponent)
+			// 创建根实例
+			new Vue({
+				el: '#example'
+			})
+
+
+
+			// 注册子组件
+			// 将当前消息派发出去
+			Vue.component('child',{
+				template: '#child-template',
+				data: function(){
+					return {msg:'hello'}
+				},
+				methods: {
+					notify: function(){
+						if (this.msg.trim()) {
+					        this.$dispatch('child-msg', this.msg)
+					        this.msg = ''
+					      }
+					}
+				}
+			})
+			// 初始化父组件
+			// 将收到消息时将事件推入一个数组
+			var parent=new Vue({
+				el: '#events-example',
+				data: {
+					messages: []
+				},
+				// 在创建实例时，'events'选项简单地调用'$on'
+				events: {
+					'child-msg': function(msg){
+						// 将回调内的'this'自动绑定到注册它的实例上
+						this.messages.push(msg)
+					}
+				}
+			})
+
+
+			new Vue({
+				el: "#transition-mode-demo",
+				data: {
+					view: 'v-a'
+				},
+				components: {
+					'v-a': {
+						template:'<div>Component A</div>'
+					},
+					'v-b': {
+						template:'<div>Component B</div>'
+					}
+				},
+				methods: {
+					check: function(eve){
+						this.view=eve.currentTarget.value
+					}
+				}
+			})
+
+		</script>
+	</body>
+</html>
