@@ -8,6 +8,7 @@
 			* {
 				font-family: simhei, Helvetica, Arial, sans-serif;
 			}
+			/* ------------------------以下为弹出框部分样式--------------------------- */
 			.dialog{
 				width: 480px;
 				position: fixed;
@@ -161,10 +162,22 @@
 			    background-color: #d9534f;
 			}
 
+			/* ------------------------以上为弹出框部分样式--------------------------- */
+
+
+
+
+			/* ------------------------以下为派发事件部分样式--------------------------- */
+
+			input{ padding: 6px 12px; }
+
+			/* ------------------------以上为派发事件分样式--------------------------- */
+
 
 		</style>
 	</head>
 	<body>
+		<!-- 弹出框 -->
 		<div id="app">
 			<modal-dialog v-bind:show.sync="show" v-bind:class="dialogClass">
 				
@@ -207,8 +220,33 @@
 				<div class="dialog-overlay"></div>
 			</div>
 		</template>
+
+		<h2>派发事件</h2>
+		<div id="app2">
+			<p>message：{{messages | json}}</p>
+			<child-component></child-component>
+		</div>
+		<template id="child-component">
+			<input type="text" v-model='msg'>
+			<button @click='addMsg'>Dispatch Event</button>
+		</template>
+
+		<h2>广播事件</h2>
+		<div id="app3">
+			<input type="text" v-model='msg'>
+			<button @click='addMsg'>Broadcast Event</button>
+			<child-component2></child-component2>
+		</div>
+		<template id="child-component2">
+			<ul>
+				<li v-for="item in messages">
+					父组件录入了信息：{{item}}
+				</li>
+			</ul>
+		</template>
 			
 		<script>
+			/*弹出框*/
 			Vue.component('modal-dialog', {
 				template: '#dialog-template',
 				props: ['show'],
@@ -231,6 +269,69 @@
 					},
 					closeDialog: function() {
 						this.show = false
+					}
+				}
+			})
+
+
+
+			/*派发事件*/
+			Vue.component('child-component',{
+				template:'#child-component',
+				data:function(){
+					return　{
+						msg:''
+					}
+				},
+				methods:{
+					addMsg:function(){
+						if(this.msg.trim()){
+							this.$dispatch('child-msg',this.msg)
+							this.msg=''
+						}
+					}
+				}
+			})
+			new Vue({
+				el:'#app2',
+				data:{
+					messages:[]
+				},
+				events:{
+					'child-msg':function(msg){
+						this.messages.push(msg)
+					}
+				}
+			})
+
+			/*广播事件*/
+			/*注册子组件*/
+			Vue.component('child-component2',{
+				template:'#child-component2',
+				data:function(){
+					return　{
+						messages:[]
+					}
+				},
+				events:{
+					'parent-msg':function(msg){
+						this.messages.push(msg)
+					}
+				}
+				
+			})
+			/*初始化父组件*/
+			new Vue({
+				el:'#app3',
+				data:{
+					msg:''
+				},
+				methods:{
+					addMsg:function(){
+						if(this.msg.trim()){
+							this.$broadcast('parent-msg',this.msg)
+							this.msg=''
+						}
 					}
 				}
 			})

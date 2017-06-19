@@ -1,0 +1,21 @@
+table{
+	width: 600px;
+	border-collapse: collapse;
+}
+td{
+	border: 1px solid #e3e3e3;
+	padding: 6px 12px;
+}
+tr>td:nth-child(1){
+	font-weight: bold;
+	color: red;
+}
+thead{
+	background-color: #58a;
+	color: white;
+	border: 1px solid #e3e3e3;
+}
+tbody>tr:nth-child(2n){
+	background-color: #eee;
+}
+input[type=text]{ padding: 6px 12px; }
