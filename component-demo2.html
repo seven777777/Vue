@@ -291,15 +291,13 @@
 	 						},
 	 						/*检测是否填写完整*/
 							itemComplete:function(){
-								var num=this.fields.length;
 								var fields=this.fields;
+								var num=fields.length;
 								for(var i=0;i<num;i++){
-									if (this.item[fields[i].name]===''){
+									if (this.item[fields[i].name]==null||this.item[fields[i].name]=="")
 										return true;
-									}else{
-										return false;
-									}
 								}
+								return false;
 							},
 	 						save:function(){
 								if(!this.itemComplete()){
@@ -313,6 +311,7 @@
 								}else{
 									alert("请将信息填写完整！")
 								}
+
 	 						}
 	 					},
 	 					events:{
