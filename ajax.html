@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Ajax</title>
+		<link rel="stylesheet" type="text/css" href="css/dialog.css">
+		<style type="text/css">
+			html {
+			    font-size: 14px;
+			}
+			body{
+				padding-top: 100px;
+			}
+			table{
+				width: 100%;
+				border-collapse: collapse;
+			}
+			td{
+				border: 1px solid #e3e3e3;
+				padding: 6px 12px;
+			}
+			thead{
+				background-color: #58a;
+				color: white;
+				border: 1px solid #e3e3e3;
+			}
+			tbody>tr:nth-child(2n){
+				background-color: #eee;
+			}
+			input[type=text]{ 
+				padding: 3px 6px; 
+				font-size: 1.2rem;
+				border: 1px solid #ccc;
+			}
+			#app{
+				margin: 0 auto;
+				max-width: 640px;
+			}
+
+			.search-input{
+				width: 80%;
+			}
+			.container{
+				padding-left: 15px;
+				padding-right: 15px;
+				margin: 10px;
+			}
+			.form-group{ margin: 10px; }
+			.form-group>label{
+				display: inline-block;
+				padding-right: 1rem;
+				width: 10rem;
+				text-align: right;
+			}
+			.form-group>input,.form-group>select{
+				display: inline-block;
+				height: 1.5rem;
+				line-height: 1.5rem;
+			}
+
+			.text-center{ text-align: center; }
+			button{
+				display: inline-block;
+				box-sizing: border-box;
+				background: #0090d3;
+				color: #fff;
+				border: 1px solid #0090d3;
+				border-radius: 3px;
+				outline: 0;
+				transition: .4s ease-out;
+				cursor: pointer;
+			}
+			.danger-btn{
+				border: 1px solid salmon;
+				background: salmon;
+			}
+
+			.dialog-header {
+			    background: #0090d3;
+			    color: #fff;
+			}
+			.btn-close {
+			    border: 1px solid #ccc;
+			    background: #ccc;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="container">
+				<simple-grid :data-list="gridData" :columns="gridColumns" v-on:load-entry="loadCustomer" v-on:delete-entry="deleteCustomer"></simple-grid>
+			</div>
+			<!-- 创建表单对话框 -->
+			<div class="container">
+				<div class="form-group">
+					<button @click="this.show = true">Create</button>
+				</div>
+			</div>
+			<modal-dialog v-bind:show.sync="show">
+				<header class="dialog-header" slot="header">
+					<h1 class="dialog-title">{{ item.customerId ? 'Edit Customer -' + item.contactName :'Create New Customer' }}</h1>
+				</header>
+
+				<div class="dialog-body" slot="body">
+					<div v-show="item.customerId" class="form-group">
+						<label>Customer Id</label>
+						<input type="text" v-model="item.customerId" disabled="disabled">
+					</div>
+					<div class="form-group">
+						<label>Company Name</label>
+						<input type="text" v-model="item.companyName">
+					</div>
+					<div class="form-group">
+						<label>Contact Name</label>
+						<input type="text" v-model="item.contactName">
+					</div>
+					<div class="form-group">
+						<label>Phone</label>
+						<input type="text" v-model="item.phone">
+					</div>
+					<div class="form-group">
+						<label></label>
+						<button @click="saveCustomer">Save</button>
+					</div>
+				</div>
+			</modal-dialog>
+		</div>
+
+		<!-- 创建和注册simple-grid组件 -->
+		<template id="grid-template">
+			<table>
+				<thead>
+					<tr>
+						<th v-for="col in columns">{{col.name | capitalize}}</th>
+						<th>Delete</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(index,entry) in dataList">
+						<td v-for='col in columns'>
+							<span v-if="col.isKey">
+								<a href="javascript:void(0)" @click="loadEntry(entry[col.name])">{{entry[col.name]}}</a>
+							</span>
+							<span v-else>{{entry[col.name]}}</span>
+						</td>
+						<td><button class="danger-btn" @click="deleteEntry(index)">detele</button></td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+		<!-- 创建和注册modal-dialog组件 -->
+		<template id="dialog-template">
+			<div class="dialogs">
+				<div class="dialog" v-bind:class="{ 'dialog-active': show }">
+					<div class="dialog-content">
+						<div class="close rotate" @click="close">
+							<span class="iconfont icon-close"></span>
+						</div>
+						<slot name="header"></slot>
+						<slot name="body"></slot>
+						<slot name="footer"></slot>
+					</div>
+				</div>
+				<div class="dialog-overlay"></div>
+			</div>
+		</template>
+
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>	
+		<script src="js/zepto.js" type="text/javascript" charset="utf-8"></script>	
+		<script type="text/javascript">
+			Vue.component('simple-grid',{
+				template:"#grid-template",
+				props:['dataList','columns'],/*传递参数*/
+				methods:{
+					loadEntry:function(key){
+						this.$dispatch('load-entry',key)
+					},
+					deleteEntry:function(entry){
+						this.$dispatch('delete-entry',entry)
+					}
+				}
+			})
+			Vue.component('modal-dialog',{
+				template:"#dialog-template",
+				props:['show'],
+ 				methods:{
+ 					close:function(){
+ 						this.show=false
+ 					}
+ 				}
+			})
+			/*基于$.ajax声明一个简单的AjaxHelper构造器*/
+			function AjaxHelper(){
+				this.ajax=function(url,type,dataType,data,callback){
+					$.ajax({
+						url:url,
+						type:type,
+						dataType:dataType,
+						data:data,
+						success:callback,
+						error:function(xhr,errorType,error){
+							alert('Ajax request error,errorType:'+errorType+',error:'+error)
+						}
+					})
+				}
+			}
+			AjaxHelper.prototype.get=function(url,data,callback){
+				this.ajax(url,'GET','json',data,callback)
+			}
+			AjaxHelper.prototype.post=function(url,data,callback){
+				this.ajax(url,'POST','json',data,callback)
+			}
+			AjaxHelper.prototype.put=function(url,data,callback){
+				this.ajax(url,'PUT','json',data,callback)
+			}
+			AjaxHelper.prototype.delete=function(url,data,callback){
+				this.ajax(url,'DELETE','json',data,callback)
+			}
+			AjaxHelper.prototype.jsonp=function(url,data,callback){
+				this.ajax(url,'GET','jsonp',data,callback)
+			}
+			AjaxHelper.prototype.constructor=AjaxHelper
+			/*发送get请求*/
+			var ajaxHelper=new AjaxHelper();
+
+			var demo=new Vue({
+				el:"#app",
+				data:{
+					show:false,
+					title:'',
+					gridColumns:[{
+						name:'customerId',
+						isKey:true
+					},{
+						name:'companyName'
+					},{
+						name:'contactName'
+					},{
+						name:'phone'
+					}],
+					gridData:[],
+					apiUrl:'http://211.149.193.19:8080/api/customers',
+					item:{}
+				},
+				ready:function(){
+					this.getCustomers()
+				},
+				methods:{
+					getCustomers:function(){
+						//定义vm变量，让它指向this，this是当前的Vue实例
+						var vm=this,
+							callback=function(data){
+								//由于函数作用域，这里不能用this
+								vm.$set('gridData',data)
+							};
+						ajaxHelper.jsonp(vm.apiUrl,null,callback)
+					},
+					createCustomer:function(){
+						var vm=this,
+							callback=function(data){
+								vm.$set('item',{})
+								//添加成功后，重新加载页面数据
+								vm.getCustomers()
+							}
+							//将vm.item直接POST到服务端
+							ajaxHelper.post(vm.apiUrl,vm.item,callback)
+							this.show=false
+					},
+					loadCustomer:function(customerId){
+						var vm=this;
+						vm.gridData.forEach(function(item){
+							if(item.customerId===customerId){
+								//使用$set设置item
+								vm.$set('item',item)
+								return
+							}
+						}),
+						// vm.$set('show',true)
+						vm.show=true
+					},
+					saveCustomer:function(){
+						this.item.customerId ? this.updateCustomer() : this.createCustomer()
+						this.show=false
+					},
+					updateCustomer:function(){
+						var vm=this,
+							callback=function(data){
+								//更新成功后重新加载数据
+								vm.getCustomers()
+							}
+						//将vm.item直接PUT到服务端
+						ajaxHelper.put(vm.apiUrl+'/'+vm.item.customerId,vm.item,callback)
+						// vm.$set('item',{})
+						//这种方法对于打开后未修改直接关闭的情况不起作用
+						//因此使用下面添加$watch的方法
+					},
+					deleteCustomer:function(index){
+						this.gridData.splice(index,1);
+					}
+				}
+			})
+			/*
+			添加$watch
+			用来跟踪data选项show属性的变化，每当关闭对话框时就重置item
+			*/
+			demo.$watch('show',function(newVal,oldVal){
+				if(oldVal){
+					this.item={}
+				}
+			})
+
+
+			
+		</script>
+	</body>
+</html>
