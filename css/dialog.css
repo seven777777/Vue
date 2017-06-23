@@ -82,6 +82,10 @@
 .dialog-body{
 	padding: 2em;
 }
+.dialog-body .error {
+    font-size: 1.2em;
+    color: salmon;
+}
 .dialog-footer{
 	margin: 0 2em;
 	padding: 2em 0;
