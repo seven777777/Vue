@@ -1,5 +1,5 @@
 /*!
- * Vue.js v1.0.26
+ * Vue.js v1.0.25
  * (c) 2016 Evan You
  * Released under the MIT License.
  */
@@ -2300,76 +2300,76 @@ var transition = Object.freeze({
 
 
   var util = Object.freeze({
-  	defineReactive: defineReactive,
-  	set: set,
-  	del: del,
-  	hasOwn: hasOwn,
-  	isLiteral: isLiteral,
-  	isReserved: isReserved,
-  	_toString: _toString,
-  	toNumber: toNumber,
-  	toBoolean: toBoolean,
-  	stripQuotes: stripQuotes,
-  	camelize: camelize,
-  	hyphenate: hyphenate,
-  	classify: classify,
-  	bind: bind,
-  	toArray: toArray,
-  	extend: extend,
-  	isObject: isObject,
-  	isPlainObject: isPlainObject,
-  	def: def,
-  	debounce: _debounce,
-  	indexOf: indexOf,
-  	cancellable: cancellable,
-  	looseEqual: looseEqual,
-  	isArray: isArray,
-  	hasProto: hasProto,
-  	inBrowser: inBrowser,
-  	devtools: devtools,
-  	isIE: isIE,
-  	isIE9: isIE9,
-  	isAndroid: isAndroid,
-  	isIos: isIos,
-  	iosVersionMatch: iosVersionMatch,
-  	iosVersion: iosVersion,
-  	hasMutationObserverBug: hasMutationObserverBug,
-  	get transitionProp () { return transitionProp; },
-  	get transitionEndEvent () { return transitionEndEvent; },
-  	get animationProp () { return animationProp; },
-  	get animationEndEvent () { return animationEndEvent; },
-  	nextTick: nextTick,
-  	get _Set () { return _Set; },
-  	query: query,
-  	inDoc: inDoc,
-  	getAttr: getAttr,
-  	getBindAttr: getBindAttr,
-  	hasBindAttr: hasBindAttr,
-  	before: before,
-  	after: after,
-  	remove: remove,
-  	prepend: prepend,
-  	replace: replace,
-  	on: on,
-  	off: off,
-  	setClass: setClass,
-  	addClass: addClass,
-  	removeClass: removeClass,
-  	extractContent: extractContent,
-  	trimNode: trimNode,
-  	isTemplate: isTemplate,
-  	createAnchor: createAnchor,
-  	findRef: findRef,
-  	mapNodeRange: mapNodeRange,
-  	removeNodeRange: removeNodeRange,
-  	isFragment: isFragment,
-  	getOuterHTML: getOuterHTML,
-  	mergeOptions: mergeOptions,
-  	resolveAsset: resolveAsset,
-  	checkComponentAttr: checkComponentAttr,
-  	commonTagRE: commonTagRE,
-  	reservedTagRE: reservedTagRE,
-  	get warn () { return warn; }
+    defineReactive: defineReactive,
+    set: set,
+    del: del,
+    hasOwn: hasOwn,
+    isLiteral: isLiteral,
+    isReserved: isReserved,
+    _toString: _toString,
+    toNumber: toNumber,
+    toBoolean: toBoolean,
+    stripQuotes: stripQuotes,
+    camelize: camelize,
+    hyphenate: hyphenate,
+    classify: classify,
+    bind: bind,
+    toArray: toArray,
+    extend: extend,
+    isObject: isObject,
+    isPlainObject: isPlainObject,
+    def: def,
+    debounce: _debounce,
+    indexOf: indexOf,
+    cancellable: cancellable,
+    looseEqual: looseEqual,
+    isArray: isArray,
+    hasProto: hasProto,
+    inBrowser: inBrowser,
+    devtools: devtools,
+    isIE: isIE,
+    isIE9: isIE9,
+    isAndroid: isAndroid,
+    isIos: isIos,
+    iosVersionMatch: iosVersionMatch,
+    iosVersion: iosVersion,
+    hasMutationObserverBug: hasMutationObserverBug,
+    get transitionProp () { return transitionProp; },
+    get transitionEndEvent () { return transitionEndEvent; },
+    get animationProp () { return animationProp; },
+    get animationEndEvent () { return animationEndEvent; },
+    nextTick: nextTick,
+    get _Set () { return _Set; },
+    query: query,
+    inDoc: inDoc,
+    getAttr: getAttr,
+    getBindAttr: getBindAttr,
+    hasBindAttr: hasBindAttr,
+    before: before,
+    after: after,
+    remove: remove,
+    prepend: prepend,
+    replace: replace,
+    on: on,
+    off: off,
+    setClass: setClass,
+    addClass: addClass,
+    removeClass: removeClass,
+    extractContent: extractContent,
+    trimNode: trimNode,
+    isTemplate: isTemplate,
+    createAnchor: createAnchor,
+    findRef: findRef,
+    mapNodeRange: mapNodeRange,
+    removeNodeRange: removeNodeRange,
+    isFragment: isFragment,
+    getOuterHTML: getOuterHTML,
+    mergeOptions: mergeOptions,
+    resolveAsset: resolveAsset,
+    checkComponentAttr: checkComponentAttr,
+    commonTagRE: commonTagRE,
+    reservedTagRE: reservedTagRE,
+    get warn () { return warn; }
   });
 
   var uid = 0;
@@ -3413,7 +3413,7 @@ var expression = Object.freeze({
     }
     var isA = isArray(val);
     var isO = isObject(val);
-    if ((isA || isO) && Object.isExtensible(val)) {
+    if (isA || isO) {
       if (val.__ob__) {
         var depId = val.__ob__.dep.id;
         if (seen.has(depId)) {
@@ -4899,13 +4899,13 @@ var template = Object.freeze({
       this.vm.$on('hook:attached', function () {
         nextTick(_this.forceUpdate);
       });
-      if (!inDoc(el)) {
-        nextTick(this.forceUpdate);
-      }
     },
 
     update: function update(value) {
       var el = this.el;
+      if (!inDoc(el)) {
+        return nextTick(this.forceUpdate);
+      }
       el.selectedIndex = -1;
       var multi = this.multiple && isArray(value);
       var options = el.options;
@@ -7820,11 +7820,11 @@ var template = Object.freeze({
 
 
   var compiler = Object.freeze({
-  	compile: compile,
-  	compileAndLinkProps: compileAndLinkProps,
-  	compileRoot: compileRoot,
-  	transclude: transclude,
-  	resolveSlots: resolveSlots
+    compile: compile,
+    compileAndLinkProps: compileAndLinkProps,
+    compileRoot: compileRoot,
+    transclude: transclude,
+    resolveSlots: resolveSlots
   });
 
   function stateMixin (Vue) {
@@ -9846,13 +9846,7 @@ var template = Object.freeze({
 
     pluralize: function pluralize(value) {
       var args = toArray(arguments, 1);
-      var length = args.length;
-      if (length > 1) {
-        var index = value % 10 - 1;
-        return index in args ? args[index] : args[length - 1];
-      } else {
-        return args[0] + (value === 1 ? '' : 's');
-      }
+      return args.length > 1 ? args[value % 10 - 1] || args[args.length - 1] : args[0] + (value === 1 ? '' : 's');
     },
 
     /**
@@ -10054,7 +10048,7 @@ var template = Object.freeze({
 
   installGlobalAPI(Vue);
 
-  Vue.version = '1.0.26';
+  Vue.version = '1.0.25';
 
   // devtools global hook
   /* istanbul ignore next */
