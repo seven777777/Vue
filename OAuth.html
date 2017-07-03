@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>基于$.ajax实现注册、登录、注销和API调用</title>
+		<link rel="stylesheet" type="text/css" href="css/dialog.css">
+		<style type="text/css">
+			html {
+			    font-size: 14px;
+			}
+			body{
+				padding-top: 100px;
+			}
+			table{
+				width: 100%;
+				border-collapse: collapse;
+			}
+			td{
+				border: 1px solid #e3e3e3;
+				padding: 6px 12px;
+			}
+			thead{
+				background-color: #58a;
+				color: white;
+				border: 1px solid #e3e3e3;
+			}
+			tbody>tr:nth-child(2n){
+				background-color: #eee;
+			}
+			input[type=text]{ 
+				padding: 3px 6px; 
+				font-size: 1.2rem;
+				border: 1px solid #ccc;
+			}
+			#app,#app2{
+				margin: 0 auto;
+				max-width: 640px;
+			}
+
+			.search-input{
+				width: 80%;
+			}
+			.container{
+				padding-left: 15px;
+				padding-right: 15px;
+				margin: 10px;
+				overflow: hidden;
+			}
+			.form-group{ margin: 10px; }
+			.form-group>label{
+				display: inline-block;
+				padding-right: 1rem;
+				width: 10rem;
+				text-align: right;
+			}
+			.form-group>input,.form-group>select{
+				display: inline-block;
+				height: 1.5rem;
+				line-height: 1.5rem;
+			}
+
+			.text-center{ text-align: center; }
+			button{
+				display: inline-block;
+				box-sizing: border-box;
+				background: #0090d3;
+				color: #fff;
+				border: 1px solid #0090d3;
+				border-radius: 3px;
+				outline: 0;
+				transition: .4s ease-out;
+				cursor: pointer;
+			}
+			.danger-btn{
+				border: 1px solid salmon;
+				background: salmon;
+			}
+
+			.dialog-header {
+			    background: #0090d3;
+			    color: #fff;
+			}
+			.btn-close {
+			    border: 1px solid #ccc;
+			    background: #ccc;
+			}
+
+			#message{ color: red; }
+			.account-info{
+				color: #0090D3;
+				float: right;
+			}
+			.result{
+				margin: 30px;
+				color: #ff0000;
+			}
+
+		</style>
+	</head>
+	<body>
+	<!-- 注册 -->
+		<div id="app">
+			<div class="container">
+				<span id="message">{{msg}}</span>
+			</div>
+			<div class="container">
+				<div class="form-group">
+					<label>电子邮箱</label>
+					<input type="text" v-model="registerModel.email" />
+				</div>
+				<div class="form-group">
+					<label>密码</label>
+					<input type="text" v-model="registerModel.password" />
+				</div>
+				<div class="form-group">
+					<label>确认密码</label>
+					<input type="text" v-model="registerModel.confirmPassword" />
+				</div>
+				<div class="form-group">
+					<label></label>
+					<button @click="register">注册</button>
+				</div>
+			</div>
+		</div>
+	<!-- 登录和注销 -->
+		<div id="app2">
+			<div class="container text-center">
+				<span id="message">{{msg}}</span>
+			</div>
+			<div class="container">
+				<div class="account-info">
+					<span v-if="userName">{{userName}} | <a href="javascript:;" @click="logout">注销</a></span>
+				</div>
+			</div>
+			<div class="container">
+				<div class="form-group">
+					<label>电子邮箱</label>
+					<input type="text" v-model="loginModel.username" />
+				</div>
+				<div class="form-group">
+					<label>密码</label>
+					<input type="text" v-model="loginModel.password" />
+				</div>
+				<div class="form-group">
+					<label></label>
+					<button @click="login">登录</button>
+				</div>
+			</div>
+			<hr>
+			<div class="container">
+				<div class="form-group">
+					<label></label>
+					<button @click="callApi">调用API</button>
+				</div>
+				<div class="result">
+					API调用结果：{{result|json}}
+				</div>
+			</div>
+		</div>
+
+
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>	
+		<script src="js/zepto.js" type="text/javascript" charset="utf-8"></script>	
+		<script type="text/javascript">
+			var demo=new Vue({
+				el:'#app',
+				data:{
+					registerUrl:'http://211.149.193.19:8100/api/Account/Register',
+					registerModel:{
+						email:'',
+						password:'',
+						confirmPassword:''
+					},
+					msg:''
+				},
+				methods:{
+					register: function(){
+						var vm=this;
+						vm.msg=''
+
+						$.ajax({
+							url:vm.registerUrl,
+							type:'POST',
+							dataType:'json',
+							data:vm.registerModel,
+							success:function(){
+								vm.msg='注册成功！'
+							},
+							error:vm.requestError
+						})
+					},
+					requestError:function(xhr,errorType,error){
+						this.msg=xhr.responseText
+					}
+				}
+			})
+
+			var demo2=new Vue({
+				el:'#app2',
+				data:{
+					loginUrl:'http://211.149.193.19:8100/token',
+					logoutUrl:'http://211.149.193.19:8100/api/Account/Logout',
+					apiUrl: 'http://211.149.193.19:8100/api/Values',
+					loginModel:{
+						username:'',
+						password:'',
+						grant_type:'password'
+					},
+					msg:'',
+					userName:'',
+					result:''
+				},
+
+				ready:function(){
+					this.userName=sessionStorage.getItem('userName')
+				},
+				methods:{
+					login:function(){
+						var vm=this
+							vm.msg=''
+							vm.result=''
+
+						$.ajax({
+							url:vm.loginUrl,
+							type:'POST',
+							dataType:'json',
+							data:vm.loginModel,
+							success:function(data){
+								vm.msg='登陆成功！'
+								vm.userName=data.userName
+								sessionStorage.setItem('accessToken',data.access_token)
+								sessionStorage.setItem('userName',vm.userName)
+							},
+							error:vm.requestError
+						})
+					},
+					logout:function(){
+						var vm=this
+							vm.msg=''
+
+						$.ajax({
+							url:vm.logoutUrl,
+							type:'POST',
+							dataType:'json',
+							success:function(data){
+								vm.msg='注销成功！'
+								vm.userName=''
+								vm.loginModel.userName=''
+								vm.loginModel.password=''
+
+								sessionStorage.removeItem('userName')
+								sessionStorage.removeItem('accessToken')
+							},
+							error:vm.requestError
+						})
+					},
+					requestError:function(xhr,errorType,error){
+						this.msg=xhr.responseText
+					},
+					callApi:function(){
+						var vm=this
+							vm.msg=''
+							vm.result=''
+
+							headers={}
+							headers.Authorization='Bearer '+sessionStorage.getItem('accessToken')
+
+						$.ajax({
+							type:'get',
+							dataType:'json',
+							url:vm.apiUrl,
+							headers:headers,
+							success:function(data){
+								vm.result=data
+							},
+							error:vm.requestError
+						})
+					}
+				}
+			})
+			
+		</script>
+	</body>
+</html>
